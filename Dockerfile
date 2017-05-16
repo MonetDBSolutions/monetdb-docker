@@ -40,9 +40,6 @@ RUN mkdir -p /var/log/supervisor
 
 # Add a monetdb config file to avoid prompts for username/password
 COPY configs/.monetdb /home/monetdb/.monetdb
-
-# Copy the init script
-COPY scripts/init-db.sh /home/monetdb/init-db.sh
  
 #######################################################
 # Cleanup
