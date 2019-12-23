@@ -5,7 +5,7 @@ Docker container for MonetDB database
 # Manual building
 ## Building
 ```
-docker build --rm -t blaeu-database .
+docker build .
 ```
 ## Running
 ```

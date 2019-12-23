@@ -6,8 +6,8 @@ RUN groupadd -g 5000 monetdb && \
     useradd -u 5000 -g 5000 monetdb
 
 # Update & upgrade
-# RUN dnf update -y && \
-#     dnf upgrade -y
+RUN dnf update -y && \
+    dnf upgrade -y
 
 # install MonetDB
 RUN rpm --import http://dev.monetdb.org/downloads/MonetDB-GPG-KEY && \
@@ -15,7 +15,6 @@ RUN rpm --import http://dev.monetdb.org/downloads/MonetDB-GPG-KEY && \
 
 # Install packages
 RUN dnf install -y --best \
-    supervisor \
     MonetDB-SQL-server5 MonetDB-client
 
 ENV MDB_HOME=/home/monetdb/
@@ -26,37 +25,29 @@ RUN chown -R monetdb:monetdb /var/monetdb5 && \
     chown -R monetdb:monetdb /var/run/monetdb 
 
 #######################################################
-# Create log dirs
-#######################################################
-RUN mkdir -p /var/log/supervisor
-
-WORKDIR ${MDB_HOME}
-
-#######################################################
-# Setup MonetDB
-#######################################################
-
-# Add a monetdb config file to avoid prompts for username/password
-COPY configs/.monetdb scripts/boot.sh ./
-RUN chmod +x boot.sh
-
-####################################################### 
- # Setup supervisord
-#######################################################
-COPY configs/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
- 
-#######################################################
 # Cleanup
 #######################################################
 RUN dnf -y clean all
 RUN rm -rf /tmp/* /var/tmp/*
 
+#######################################################
+# Setup MonetDB
+#######################################################
+WORKDIR ${MDB_HOME}
+# Add a monetdb config file to avoid prompts for username/password
+COPY configs/.monetdb ./
 RUN chown -R monetdb:monetdb ./
-#USER monetdb
+
+USER monetdb
+RUN rm -rf ${DB_FARM}
+RUN monetdbd create ${DB_FARM}
+RUN monetdbd set listenaddr=0.0.0.0 /var/monetdb5/dbfarm
+RUN monetdbd start ${DB_FARM} \
+    && monetdb create demo \
+    && monetdb release demo
 
 EXPOSE 50000
 
 VOLUME /var/monetdb5
 
-ENTRYPOINT ["./boot.sh"]
-CMD [ "devdb" ]
+CMD ["monetdbd", "start", "-n", "/var/monetdb5/dbfarm"]
