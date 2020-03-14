@@ -20,10 +20,6 @@ RUN dnf install -y --best \
 ENV MDB_HOME=/home/monetdb/
 ENV DB_FARM=/var/monetdb5/dbfarm
 
-RUN chown -R monetdb:monetdb /var/monetdb5 && \
-    chown -R monetdb:monetdb /var/log/monetdb && \
-    chown -R monetdb:monetdb /var/run/monetdb 
-
 #######################################################
 # Cleanup
 #######################################################
@@ -36,18 +32,16 @@ RUN rm -rf /tmp/* /var/tmp/*
 WORKDIR ${MDB_HOME}
 # Add a monetdb config file to avoid prompts for username/password
 COPY configs/.monetdb ./
-RUN chown -R monetdb:monetdb ./
 
-USER monetdb
 RUN rm -rf ${DB_FARM}
 RUN monetdbd create ${DB_FARM}
 RUN monetdbd set listenaddr=0.0.0.0 /var/monetdb5/dbfarm
-RUN monetdbd start ${DB_FARM} \
-    && monetdb create demo \
-    && monetdb release demo
+
+RUN chown -R monetdb:monetdb ${MDB_HOME}
+RUN chown -R monetdb:monetdb /var/monetdb5 && \
+    chown -R monetdb:monetdb /var/log/monetdb && \
+    chown -R monetdb:monetdb /var/run/monetdb 
 
 EXPOSE 50000
-
-VOLUME /var/monetdb5
 
 CMD ["monetdbd", "start", "-n", "/var/monetdb5/dbfarm"]
