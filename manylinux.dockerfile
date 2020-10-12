@@ -3,7 +3,7 @@ FROM quay.io/pypa/manylinux2014_x86_64
 
 # install monetdb build dependencies
 RUN yum update
-RUN yum install -y cmake3 openssl-devel mercurial
+RUN yum install -y cmake3 openssl-devel wget
 
 # download and extract monetdb
 WORKDIR /tmp 

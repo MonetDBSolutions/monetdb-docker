@@ -4,7 +4,7 @@ ENV DEBIAN_FRONTEND noninteractve
 
 # install monetdb build dependencies
 RUN apt-get update && \
-    apt-get install -y cmake python3-dev python3-pip curl bison libpcre3-dev libssl-dev mercurial
+    apt-get install -y cmake python3-dev python3-pip curl bison libpcre3-dev libssl-dev wget
 
 # download and extract monetdb
 WORKDIR /tmp 
