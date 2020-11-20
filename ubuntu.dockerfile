@@ -13,9 +13,10 @@ RUN tar jxf MonetDB.tar.bz2
 
 RUN mkdir /tmp/MonetDB-BRANCH/build
 WORKDIR /tmp/MonetDB-BRANCH/build 
-RUN cmake .. -DWITH_CRYPTO=OFF -DINT128=OFF -DPY3INTEGRATION=OFF -DCMAKE_BUILD_TYPE=Release -DASSERT=OFF -DSTRICT=OFF -DRINTEGRATION=OFF
+RUN cmake .. -DWITH_CRYPTO=OFF -DINT128=ON -DPY3INTEGRATION=OFF -DCMAKE_BUILD_TYPE=Release -DASSERT=OFF -DSTRICT=OFF -DRINTEGRATION=OFF
 RUN cmake --build .
 RUN cmake --build . --target install
+RUN rm -rf /tmp/MonetDB-BRANCH
 
 # preinstall dependencies
 RUN pip3 install --upgrade pip pytest numpy pandas mypy pycodestyle
