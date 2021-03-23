@@ -1,11 +1,7 @@
 #!/bin/bash
 
 # Add a monetdb config file to avoid prompts for username/password
-# Only if it doesn't exist - this allows users to mount their own file, or overwrite 
-if [ ! -e ~/.monetdb ]
-then
-    printf "user=monetdb\npassword=${DB_PASSWORD}" > ~/.monetdb
-fi
+printf "user=monetdb\npassword=${DB_PASSWORD}" > ~/.monetdb
 
 monetdbd start ${DB_FARM}
 monetdb create -p ${DB_PASSWORD} ${DB_NAME}
