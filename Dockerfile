@@ -28,22 +28,20 @@ RUN rm -rf /tmp/* /var/tmp/*
 # Setup MonetDB
 #######################################################
 WORKDIR ${MDB_HOME}
-
-# Copy the entrypoint script (see scripts/entrypoint.sh for more details)
-COPY scripts/entrypoint.sh ${MDB_HOME}
-RUN chmod +x ${MDB_HOME}/entrypoint.sh
-RUN chown -R monetdb:monetdb ${MDB_HOME}/entrypoint.sh
+# Add a monetdb config file to avoid prompts for username/password
+COPY configs/.monetdb ./
+RUN chown -R monetdb:monetdb ./
 
 USER monetdb
 RUN rm -rf ${DB_FARM}
 RUN monetdbd create ${DB_FARM}
-RUN monetdbd set listenaddr=all ${DB_FARM}
-
-ENV DB_NAME demo
-ENV DB_PASSWORD monetdb
+RUN monetdbd set listenaddr=all /var/monetdb5/dbfarm
+RUN monetdbd start ${DB_FARM} \
+    && monetdb create demo \
+    && monetdb release demo
 
 EXPOSE 50000
 
 VOLUME /var/monetdb5
 
-CMD ["./entrypoint.sh"]
+CMD ["monetdbd", "start", "-n", "/var/monetdb5/dbfarm"]
