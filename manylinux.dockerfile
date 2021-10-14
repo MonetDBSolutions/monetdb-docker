@@ -7,7 +7,7 @@ RUN yum install -y cmake3 openssl-devel wget
 
 # download and extract monetdb
 WORKDIR /tmp 
-RUN wget https://www.monetdb.org/hg/MonetDB/archive/BRANCH.tar.bz2 -O MonetDB.tar.bz2 
+RUN curl -o MonetDB.tar.bz2 https://www.monetdb.org/hg/MonetDB/archive/BRANCH.tar.bz2 
 RUN tar jxf MonetDB.tar.bz2
 
 RUN mkdir /tmp/MonetDB-BRANCH/build
