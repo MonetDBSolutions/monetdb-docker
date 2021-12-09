@@ -22,16 +22,14 @@ RUN cmake3 .. \
     -DASSERT=OFF -DSTRICT=OFF \
     -DRINTEGRATION=OFF
 RUN cmake3 --build .  -j ${BUILD_THREADS}
-RUN cmake3 --build . --target install 
-RUN rm -rf /tmp/MonetDB-BRANCH
+RUN cmake3 --build . --target install
 
-# add shared libraries to wheels
-ENV LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:/usr/local/lib"
+
 
 FROM quay.io/pypa/manylinux2014_x86_64 as runtime
 
 RUN yum update -y
-RUN yum install -y openssl-devel
+RUN yum install -y openssl-devel python3-pip
 
 RUN rm -rf /usr/local
 COPY --from=build /usr/local /usr/local
