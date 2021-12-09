@@ -1,8 +1,11 @@
 FROM quay.io/pypa/manylinux2014_x86_64 as build
+
 ARG BRANCH=Jul2021
+ARG BUILD_THREADS=4
+
 # install monetdb build dependencies
 RUN yum update -y
-RUN yum install -y cmake3 openssl-devel wget
+RUN yum install -y cmake3 openssl-devel wget python3
 
 # download and extract monetdb
 WORKDIR /tmp 
@@ -18,7 +21,7 @@ RUN cmake3 .. \
     -DCMAKE_BUILD_TYPE=Release \
     -DASSERT=OFF -DSTRICT=OFF \
     -DRINTEGRATION=OFF
-RUN cmake3 --build . 
+RUN cmake3 --build .  -j ${BUILD_THREADS}
 RUN cmake3 --build . --target install 
 RUN rm -rf /tmp/MonetDB-BRANCH
 

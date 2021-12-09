@@ -1,6 +1,7 @@
-
 FROM ubuntu:20.04 as build
+
 ARG BRANCH=Jul2021
+ARG BUILD_THREADS=4
 ENV DEBIAN_FRONTEND noninteractve
 
 # install monetdb build dependencies
@@ -23,7 +24,7 @@ RUN cmake .. \
     -DASSERT=OFF \
     -DSTRICT=OFF \
     -DRINTEGRATION=OFF
-RUN cmake --build .
+RUN cmake --build . -j ${BUILD_THREADS}
 RUN cmake --build . --target install
 
 
