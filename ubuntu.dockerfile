@@ -1,6 +1,6 @@
 FROM ubuntu:20.04 as build
 
-ARG BRANCH=Jul2021
+ARG BRANCH=default
 ARG BUILD_THREADS=4
 ENV DEBIAN_FRONTEND noninteractve
 
@@ -11,7 +11,7 @@ RUN apt-get update && \
 
 # download and extract monetdb
 WORKDIR /tmp 
-RUN wget https://www.monetdb.org/hg/MonetDB/archive/${BRANCH}.tar.bz2 -O MonetDB.tar.bz2
+RUN curl -o MonetDB.tar.bz2 https://www.monetdb.org/hg/MonetDB/archive/${BRANCH}.tar.bz2
 RUN tar jxf MonetDB.tar.bz2
 
 RUN mkdir /tmp/MonetDB-${BRANCH}/build

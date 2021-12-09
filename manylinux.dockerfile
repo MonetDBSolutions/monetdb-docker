@@ -1,6 +1,6 @@
 FROM quay.io/pypa/manylinux2014_x86_64 as build
 
-ARG BRANCH=Jul2021
+ARG BRANCH=default
 ARG BUILD_THREADS=4
 
 # install monetdb build dependencies
