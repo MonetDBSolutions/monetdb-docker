@@ -37,7 +37,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 
-RUN pip3 install --upgrade pip pytest numpy pandas mypy pycodestyle
+RUN pip3 install --no-cache --upgrade pip pytest numpy pandas mypy pycodestyle
 
 RUN rm -rf /usr/local
 COPY --from=build /usr/local /usr/local
