@@ -4,8 +4,9 @@ ARG BRANCH=default
 ARG BUILD_THREADS=4
 
 # install monetdb build dependencies
-RUN yum update -y
-RUN yum install -y cmake3 openssl-devel wget python3
+RUN yum install -y cmake3 openssl-devel wget python3  \
+  	&& yum clean all \
+  	&& rm -rf /var/cache/yum
 
 # download and extract monetdb
 WORKDIR /tmp 
@@ -28,14 +29,8 @@ RUN cmake3 --build . --target install
 
 FROM quay.io/pypa/manylinux2014_x86_64 as runtime
 
-RUN yum update -y
-RUN yum install -y openssl-devel python3-pip
-
 RUN rm -rf /usr/local
 COPY --from=build /usr/local /usr/local
 
 # add shared libraries to wheels
 ENV LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:/usr/local/lib"
-
-# preinstall dependencies
-RUN pip3 install --upgrade pip pytest numpy pandas mypy pycodestyle
