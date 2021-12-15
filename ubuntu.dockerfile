@@ -6,7 +6,7 @@ ENV DEBIAN_FRONTEND noninteractve
 
 # install monetdb build dependencies
 RUN apt-get update && \
-    apt-get install -y cmake bison libpcre3-dev libssl-dev wget python3 && \
+    apt-get install -y cmake bison libpcre3-dev libssl-dev curl python3 && \
     rm -rf /var/lib/apt/lists/*
 
 # download and extract monetdb
@@ -33,8 +33,8 @@ FROM ubuntu:20.04 as runtime
 
 # install monetdb build dependencies
 RUN apt-get update && \
-    apt-get install -y python3-pip libpcre3-dev libssl-dev && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y python3-pip libpcre3 libssl1.1 && \
+    rm -rf /var/lib/apt
 
 
 RUN pip3 install --no-cache --upgrade pip pytest numpy pandas mypy pycodestyle
