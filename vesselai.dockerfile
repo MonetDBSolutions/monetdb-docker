@@ -1,14 +1,15 @@
 FROM ubuntu:20.04 as build
 
 ARG BRANCH=geo-update
-ENV DEBIAN_FRONTEND noninteractve
 
 # install monetdb build dependencies
 
 RUN apt-get update && \
+    DEBIAN_FRONTEND="noninteractive" \
+    TZ="Europe/Amsterdam" \
     apt-get install -y cmake bison libpcre3-dev libssl-dev wget \
                        python3 libgdal-dev gdal-bin libgeos-dev \
-                       libproj-dev unzip libcurl4-gnutls-dev && \
+                       libproj-dev unzip libcurl4-gnutls-dev readline-common && \
     rm -rf /var/lib/apt/lists/*
 
 # download and extract monetdb
@@ -28,43 +29,44 @@ RUN cmake .. \
     -DASSERT=OFF \
     -DSTRICT=OFF \
     -DRINTEGRATION=OFF \
-    -DGEOM=ON
+    -DGEOM=ON \
+    -DSHP=ON
 RUN cmake --build . -j
 RUN cmake --build . --target install
 
 FROM ubuntu:20.04 as runtime
 
-ENV DEBIAN_FRONTEND="noninteractive"
-ENV TZ="Europe/Amsterdam" 
-
-# install monetdb build dependencies
-
+# install monetdb runtime dependencies
+# TODO: which of these dependencies is actually necessary?
 RUN apt-get update && \
-    apt-get install -y python3-pip libpcre3 libssl1.1 libgdal-dev \
-                       gdal-bin libgeos-dev libcurl4-gnutls-dev && \
+    DEBIAN_FRONTEND="noninteractive" \
+    TZ="Europe/Amsterdam" \
+    apt-get install -y libcurl4-gnutls-dev readline-common \
+                       libpcre3 libssl1.1 libgdal-dev \
+                       gdal-bin libgeos-dev  && \
     rm -rf /var/lib/apt
 
-RUN pip3 install --no-cache --upgrade pip pytest numpy pandas mypy \
-    pycodestyle
+# copy MonetDB install from build container
 
 RUN rm -rf /usr/local
 COPY --from=build /usr/local /usr/local
 
-# add shared libraries to wheels
+# start init script directory
+RUN mkdir /initdb
 
-ENV LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:/usr/local/lib"
-
-# start monetdb deamon with database demo
+# set env variables defaults
 
 ENV DB_FARM=/var/monetdb5/dbfarm
+ENV DB_NAME=demo
+ENV DB_USER=monetdb
+ENV DB_PASSWORD=monetdb
 
-RUN rm -rf ${DB_FARM}
-RUN monetdbd create ${DB_FARM}
-RUN monetdbd set listenaddr=all /var/monetdb5/dbfarm
-RUN monetdbd start ${DB_FARM} \
-    && monetdb create demo \
-    && monetdb release demo
+# copy start script and run it
+
+COPY scripts/boot_vesselai.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/boot_vesselai.sh
 
 EXPOSE 50000
 
-CMD ["monetdbd", "start", "-n", "/var/monetdb5/dbfarm"]
+ENTRYPOINT /usr/local/bin/boot_vesselai.sh ${DB_FARM} \
+           ${DB_NAME} ${DB_USER} ${DB_PASSWORD}
