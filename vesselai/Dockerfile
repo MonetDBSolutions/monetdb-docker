@@ -57,16 +57,16 @@ RUN mkdir /initdb
 # set env variables defaults
 
 ENV DB_FARM=/var/monetdb5/dbfarm
-ENV DB_NAME=demo
+ENV DB_NAME=vesselai
 ENV DB_USER=monetdb
 ENV DB_PASSWORD=monetdb
 
 # copy start script and run it
 
-COPY scripts/boot_vesselai.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/boot_vesselai.sh
+COPY entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 EXPOSE 50000
 
-ENTRYPOINT /usr/local/bin/boot_vesselai.sh ${DB_FARM} \
+ENTRYPOINT /usr/local/bin/entrypoint.sh ${DB_FARM} \
            ${DB_NAME} ${DB_USER} ${DB_PASSWORD}
