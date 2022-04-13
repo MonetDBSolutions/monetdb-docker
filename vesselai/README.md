@@ -45,10 +45,14 @@ You can find examples on how to use bind mounts with `docker run` and
 ## Start the container
 
 ### Docker Compose example
-_NOTE_: If you are a Mac or Windows user, use docker-compose to be able to connect to the dat
-abase from the host machine. If you use docker run, you will only be able to connect through
-docker exec (connecting from the container).
-Run container with custom _username_ and _password_, without using docker volumes and no database initialization scripts.
+
+**NOTE**: If you are a Mac or Windows user, use docker-compose to be
+able to connect to the database from the host machine. If you use docker
+run, you will only be able to connect through docker exec (connecting
+from the container).
+
+Run container with custom _username_ and _password_, without using
+docker volumes and no database initialization scripts.
 ```yml
 services:
     database:
@@ -94,8 +98,10 @@ docker run -d -p <LOCAL_PORT>:50000 \
 ```
 
 Run container with custom _username_ and _password_, and use a docker
-volume to store the data. **Note:** the target value for the mount must
-be the same value as _DB_FARM_ (default is `/var/monetdb5/dbfarm`).
+volume to store the data.
+
+**Note:** the target value for the mount must be the same value as
+_DB_FARM_ (default is `/var/monetdb5/dbfarm`).
 
 ```sh
 docker run -d -p <LOCAL_PORT>:50000 \
@@ -107,9 +113,10 @@ docker run -d -p <LOCAL_PORT>:50000 \
 ```
 
 Run container with a custom database name and execute database
-initialization scripts in the current working directory. **Note:** the
-`/initdb/` directory in the container is always used to store init
-scripts.
+initialization scripts in the current working directory. 
+
+**Note:** the `/initdb/` directory in the container is always used to
+store init scripts.
 
 ```sh
 docker run -d -p <LOCAL_PORT>:50000 \
