@@ -26,6 +26,9 @@ You can find examples on how to use bind mounts with 'docker run' and 'docker co
 ## Start the container
 
 ### Docker Compose example
+_NOTE_: If you are a Mac or Windows user, use docker-compose to be able to connect to the dat
+abase from the host machine. If you use docker run, you will only be able to connect through
+docker exec (connecting from the container).
 Run container with custom username and password, without using docker volumes and no database initialization scripts.
 ```
 services:
@@ -101,7 +104,7 @@ mclient -p 50000 -d vesselai -u monetdb
 TODO: pymonetdb example
 
 ### Using docker exec
-Using 'docker exec' or 'docker-compose exec' you can connect to the container and use the client on the container itself. This can be useful if using Docker Desktop for Mac and Windows, which have limited capacity for connection from the host machine.
+Using 'docker exec' or 'docker-compose exec' you can connect to the container and use the client on the container itself. This is useful if you are using docker-run and are a Mac and Windows user.
 
 ```
 docker exec -it <CONTAINER_NAME> mclient -d <DATABASE_NAME> -u <USERNAME>
