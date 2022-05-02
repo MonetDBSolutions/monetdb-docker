@@ -1,18 +1,26 @@
   services:
     database:
       build: .
+      #image: monetdb/vessel_ai:latest
       ports: 
         - 50000:50000
       environment:
         DB_FARM: "/var/monetdb5/dbfarm"
         DB_NAME: "vesselai_db"
         DB_USER: "vesselai_user"
-        DB_PASSWORD: "vesselai_pass"
+        #DB_PASSWORD: "vesselai_pass"
+        DB_PASSWORD_FILE: "/run/secrets/db_password_file"
       volumes:
-        - database_storage:/var/monetdb5/dbfarm
+        #- database_storage:/var/monetdb5/dbfarm
         - type: bind
           source: ./
           target: /initdb/
-  volumes:
-    database_storage:
+      secrets:
+        - db_password_file
+  #volumes:
+    #database_storage:
+  
+  secrets:
+    db_password_file:
+      file: ./db_password_file.txt
 

@@ -60,6 +60,7 @@ ENV DB_FARM=/var/monetdb5/dbfarm
 ENV DB_NAME=vesselai
 ENV DB_USER=monetdb
 ENV DB_PASSWORD=monetdb
+ENV DB_PASSWORD_FILE=NO_FILE
 
 # copy start script and run it
 
@@ -69,4 +70,4 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 EXPOSE 50000
 
 ENTRYPOINT /usr/local/bin/entrypoint.sh ${DB_FARM} \
-           ${DB_NAME} ${DB_USER} ${DB_PASSWORD}
+           ${DB_NAME} ${DB_USER} ${DB_PASSWORD} ${DB_PASSWORD_FILE}
