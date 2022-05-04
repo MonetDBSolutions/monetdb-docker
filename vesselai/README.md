@@ -12,16 +12,27 @@ scripts present in the host system.
 
 ### Environment variables
 
-- **DB_NAME**: Set the database name (default is **"vesselai"**)
+- **DB_NAME**: Set the database name (default is _vesselai_)
 - **DB_USER**: Set the user name for database access (default is
-  **"monetdb"**)
-- **DB_PASSWORD**: Set the password for database access in plain text (default is
-  **"monetdb"**). **NOTE**: For non-testing purposes, consider using *DB_PASSWORD_FILE* to keep your password safe.
-- **DB_PASSWORD_FILE**: Sets the Docker Secrets location for the password file. This is a safe way to set the database access password, without exposing the password as text in the docker run/docker compose command. **NOTE**: DB_PASSWORD_FILE takes precedence over DB_PASSWORD when setting the database password, when both variables are set.
+  _monetdb_)
+- **DB_PASSWORD**: Set the password for database access in plain text
+  (default is __monetdb__). 
+  
+  **NOTE**: For non-testing purposes, consider using _DB_PASSWORD_FILE_
+  to keep your password safe.
+- **DB_PASSWORD_FILE**: Sets the Docker Secrets location for the
+  password file. This is a safe way to set the database access password,
+  without exposing the password as text in the docker run/docker compose
+  command.
+  
+  **NOTE**: _DB_PASSWORD_FILE_ takes precedence over _DB_PASSWORD_ when
+  setting the database password, when both variables are set.
 - **DB_FARM**: Set where data is stored in the container's filesystem.
-  The default is **"/var/monetdb5/dbfarm"**. **NOTE**:  If you want to
-  store the database data in a Docker Volume, you should set the
-  target/destination of the volume to this DB_FARM directory.
+  The default is `/var/monetdb5/dbfarm`.
+  
+  **NOTE**: If you want to store the database data in a Docker Volume,
+  you should set the target/destination of the volume to this _DB_FARM_
+  directory.
 
 ### Store data in a volume
 
@@ -45,9 +56,15 @@ You can find examples on how to use bind mounts with `docker run` and
 
 ### Docker secrets
 
-To avoid exposing sensitive password data, you can use the **DB_PASSWORD_FILE** variable to safely transfer a file containing the database password to the container. The password file should only contain the text password for the admin user. The file will be stored in `/run/secrets/<secret_name>`.
+To avoid exposing sensitive password data, you can use the
+**DB_PASSWORD_FILE** variable to safely transfer a file containing the
+database password to the container. The password file should only
+contain the text password for the admin user. The file will be stored in
+`/run/secrets/<secret_name>`.
 
-Here is an example with Docker Compose, which also creates the secret by specifying where the db_password_file is in the host:
+Here is an example with Docker Compose, which also creates the secret by
+specifying where the _db_password_file_ is in the host:
+
 ```yml
 services:
     database:
@@ -62,12 +79,15 @@ services:
     db_password_file:
       file: ./db_password_file.txt
 ```
+
 Contents of `./db_password_file.txt`:
+
 ```
 db_password_test
 ```
 
-Alternatively, you can create the secret through `docker secret create` and then simply set the correct filename for **DB_PASSWORD_FILE**.
+Alternatively, you can create the secret through `docker secret create`
+and then simply set the correct filename for _DB_PASSWORD_FILE_.
 
 ## Start the container
 
