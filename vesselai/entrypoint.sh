@@ -1,54 +1,92 @@
 #!/bin/bash
+
 set -e
 set -o pipefail
 
-# argument list
-# arg 1: db_farm
-# arg 2: db_name
-# arg 3: db_user
-# arg 4: db_password
-# arg 5: db_password_file
-
-# create DB farm, create database
-monetdbd create ${1}
-monetdbd start ${1}
-monetdbd set listenaddr=0.0.0.0 ${1}
-monetdb create ${2}
-monetdb release ${2}
-monetdb start ${2}
-
-# create a auth file to login as admin
-printf "user=monetdb\npassword=monetdb\n" > $(pwd)/.monetdb
-
-# initialize database with scripts
-if [ -n "$(ls -A /initdb/*.sql 2> /dev/null)" ]; then 
-    for filename in /initdb/*.sql; do
-        mclient -d ${2} ${filename}
-    done
+if [ "$#" -ne 5 ]; then
+    echo "Usage: $0 <db_farm> <db_name> <db_user> <db_pass> <db_passfile>"
+    exit 1
 fi
 
-# change username of admin account
-if [[ "$3" != "monetdb" ]]; then
-    mclient -d ${2} -s "ALTER USER monetdb RENAME TO ${3}"
-    printf "user=${3}\npassword=monetdb\n" > $(pwd)/.monetdb
+db_farm=${1}
+db_name=${2}
+db_user=${3}
+db_pass=${4}
+db_passfile=${5}
+
+create_farm () {
+    local db_farm=${1}
+
+    monetdbd create ${db_farm}
+    monetdbd set listenaddr=0.0.0.0 ${db_farm}
+}
+
+create_db () {
+    local db_farm=${1} 
+    local db_name=${2}
+
+    monetdb create ${db_name}
+    monetdb release ${db_name}
+}
+
+setup_admin () {
+    local db_name=${1}
+    local db_user=${2}
+    local db_pass=${3}
+    local db_passfile=${4}
+    
+    # create a auth file to login as admin
+    printf "user=monetdb\npassword=monetdb\n" > $(pwd)/.monetdb
+
+    # initialize database with scripts
+    local init_scripts=$(ls -A /initdb/*.sql 2> /dev/null)
+    if [ -n "${init_scripts}" ]; then 
+        for filename in /initdb/*.sql; do
+            mclient -d ${db_name} ${filename}
+        done
+    else
+        echo "No database init scripts found"
+    fi
+
+    # change username of admin account
+    if [[ "${db_user}" != "monetdb" ]]; then
+        mclient -d ${db_name} -s "ALTER USER monetdb RENAME TO ${db_user}"
+        printf "user=${db_user}\npassword=monetdb\n" > $(pwd)/.monetdb
+    fi
+
+    # change password of admin account
+    # password file has priority over text password
+    if [[ "${db_passfile}" != "NO_FILE" ]]; then
+        DB_PASSWORD=$(<${db_passfile})
+        mclient -d ${db_name} -s "ALTER USER SET UNENCRYPTED PASSWORD '${DB_PASSWORD}' USING OLD PASSWORD 'monetdb'"
+    elif [[ "${db_pass}" != "monetdb" ]]; then
+        mclient -d ${db_name} -s "ALTER USER SET UNENCRYPTED PASSWORD '${db_pass}' USING OLD PASSWORD 'monetdb'"
+    fi
+
+    # remove the auth file
+    rm $(pwd)/.monetdb
+}
+
+# create DBfarm
+if [ ! -e "${db_farm}/.merovingian_properties" ];
+then
+    create_farm ${db_farm}
+else
+    echo "Existing dbfarm named ${db_farm} found"
 fi
 
-# change password of admin account
-# password file has priority over text password
-if [[ "$5" != "NO_FILE" ]]; then
-    DB_PASSWORD=$(<${5})
-    mclient -d ${2} -s "ALTER USER SET UNENCRYPTED PASSWORD '${DB_PASSWORD}' USING OLD PASSWORD 'monetdb'"
-elif [[ "$4" != "monetdb" ]]; then
-    mclient -d ${2} -s "ALTER USER SET UNENCRYPTED PASSWORD '${4}' USING OLD PASSWORD 'monetdb'"
+# create DB and set up admin account
+if [ ! -s "${db_farm}/${db_name}" ];
+then
+    monetdbd start ${db_farm}
+    create_db ${db_farm} ${db_name}
+    setup_admin ${db_name} ${db_user} ${db_pass} ${db_passfile}
+    monetdbd stop ${db_farm}
+else
+    echo "Database ${db_name} already exists"
 fi
-
-# remove the auth file
-rm $(pwd)/.monetdb
-
-# stop the daemon
-monetdbd stop ${1}
 
 echo "Initialization done"
 
-monetdbd start -n ${1}
+monetdbd start -n ${db_farm}
 #mserver5 --dbpath=${1}/${2} --set monet_vault_key=${1}/${2}/.vaultkey --set mapi_listenaddr=0.0.0.0
