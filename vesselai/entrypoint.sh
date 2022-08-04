@@ -57,7 +57,9 @@ setup_admin () {
     # change password of admin account
     # password file has priority over text password
     if [[ "${db_passfile}" != "NO_FILE" ]]; then
-        DB_PASSWORD=$(<${db_passfile})
+        # make sure that `\` and `'` characters in the password are 
+        # properly escaped 
+        local DB_PASSWORD=$(sed 's/\\/\\\\/g' ${db_passfile} | sed "s/'/''/g")
         mclient -d ${db_name} -s "ALTER USER SET UNENCRYPTED PASSWORD '${DB_PASSWORD}' USING OLD PASSWORD 'monetdb'"
     elif [[ "${db_pass}" != "monetdb" ]]; then
         mclient -d ${db_name} -s "ALTER USER SET UNENCRYPTED PASSWORD '${db_pass}' USING OLD PASSWORD 'monetdb'"
