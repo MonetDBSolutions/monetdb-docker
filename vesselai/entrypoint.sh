@@ -70,6 +70,7 @@ setup_admin () {
 # create DBfarm
 if [ ! -e "${db_farm}/.merovingian_properties" ];
 then
+    echo "Creating dbfarm ${db_farm}"
     create_farm ${db_farm}
 else
     echo "Existing dbfarm named ${db_farm} found"
@@ -79,14 +80,15 @@ fi
 if [ ! -s "${db_farm}/${db_name}" ];
 then
     monetdbd start ${db_farm}
+    echo "Creating database ${db_name}"
     create_db ${db_farm} ${db_name}
+    echo "Setting up admin account" 
     setup_admin ${db_name} ${db_user} ${db_pass} ${db_passfile}
     monetdbd stop ${db_farm}
 else
     echo "Database ${db_name} already exists"
 fi
 
-echo "Initialization done"
-
+echo "Initialization done! - Starting mserver5 daemon"
 monetdbd start -n ${db_farm}
 #mserver5 --dbpath=${1}/${2} --set monet_vault_key=${1}/${2}/.vaultkey --set mapi_listenaddr=0.0.0.0
