@@ -15,7 +15,9 @@ docker_create_dbfarm () {
     monetdbd set control=true "$farm_dir"
     monetdbd set passphrase="$daemon_pass" "$farm_dir"
 
-    monetdbd get all "$farm_dir"
+    if [[ "${MDB_SHOW_VARS:-}" ]]; then
+        monetdbd get all "$farm_dir"
+    fi
 
     echo "Created db farm at ${farm_dir}"
 }
