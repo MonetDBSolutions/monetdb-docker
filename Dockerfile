@@ -15,8 +15,7 @@ RUN dnf install -y https://dev.monetdb.org/downloads/Fedora/MonetDB-release.noar
 RUN dnf install -y --best \
     MonetDB-SQL-server5 MonetDB-client
 
-ENV MDB_HOME=/home/monetdb/
-ENV DB_FARM=/var/monetdb5/dbfarm
+ENV MDB_DBFARM=/var/monetdb5/dbfarm
 
 #######################################################
 # Cleanup
@@ -27,22 +26,11 @@ RUN rm -rf /tmp/* /var/tmp/*
 #######################################################
 # Setup MonetDB
 #######################################################
-WORKDIR ${MDB_HOME}
-# Add a monetdb config file to avoid prompts for username/password
-COPY configs/.monetdb ./
-
-RUN rm -rf ${DB_FARM}
-RUN monetdbd create ${DB_FARM}
-RUN monetdbd set listenaddr=all /var/monetdb5/dbfarm
-RUN monetdbd start ${DB_FARM} \
-    && monetdb create demo \
-    && monetdb release demo
-
-RUN chown -R monetdb:monetdb ${MDB_HOME}
-RUN chown -R monetdb:monetdb /var/monetdb5 && \
-    chown -R monetdb:monetdb /var/log/monetdb && \
-    chown -R monetdb:monetdb /var/run/monetdb 
+COPY entrypoint.sh /usr/local/bin
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 EXPOSE 50000
 
-CMD ["monetdbd", "start", "-n", "/var/monetdb5/dbfarm"]
+ENTRYPOINT ["entrypoint.sh"]
+
+STOPSIGNAL SIGINT
