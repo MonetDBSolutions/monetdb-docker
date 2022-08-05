@@ -13,7 +13,9 @@ RUN dnf install -y https://dev.monetdb.org/downloads/Fedora/MonetDB-release.noar
 
 # Install packages
 RUN dnf install -y --best \
-    MonetDB-SQL-server5 MonetDB-client
+    MonetDB-SQL-server5 MonetDB-client \
+    MonetDB-cfitsio MonetDB-geom-MonetDB5\
+    MonetDB-python3
 
 ENV MDB_DBFARM=/var/monetdb5/dbfarm
 
