@@ -8,16 +8,17 @@ RUN groupadd -g 5000 monetdb && \
 # Update & upgrade
 RUN dnf upgrade -y
 
+# Install compression schemes
+RUN dnf install -y xz bzip2 lz4 gzip
+
 # install MonetDB
 RUN dnf install -y https://dev.monetdb.org/downloads/Fedora/MonetDB-release.noarch.rpm
 
-# Install packages
+# Install MonetDB packages
 RUN dnf install -y --best \
     MonetDB-SQL-server5 MonetDB-client \
     MonetDB-cfitsio MonetDB-geom-MonetDB5\
     MonetDB-python3
-
-ENV MDB_DBFARM=/var/monetdb5/dbfarm
 
 #######################################################
 # Cleanup
