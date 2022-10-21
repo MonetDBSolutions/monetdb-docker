@@ -29,7 +29,7 @@ RUN rm -rf /tmp/* /var/tmp/*
 #######################################################
 # Setup MonetDB
 #######################################################
-COPY entrypoint.sh /usr/local/bin
+COPY scripts/entrypoint.sh /usr/local/bin
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 EXPOSE 50000
