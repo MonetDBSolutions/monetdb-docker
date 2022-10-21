@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -eo pipefail
+set +x
 
 
 # We need to set a number of properties, but we also need to remember
