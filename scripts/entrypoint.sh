@@ -19,13 +19,13 @@ setup_environment () {
     # - logfile
     # - snapshotdir
     # - snapshotcompression
-    [[-e "${farm_dir}/.container_env" ]] && source "${farm_dir}/.container_env"
+    [[ -e "${farm_dir}/.container_env" ]] && source "${farm_dir}/.container_env"
 
 
     # We update the variables in case the user passed new values at
     # the command line.
-    export daemon_pass="${MDB_DAEMONPASS:-${daemon_pass}}"
-    export logfile="${MDB_LOGFILE:-${logfile}}"
+    export daemon_pass="${MDB_DAEMONPASS:-${daemon_pass:-monetdb}}"
+    export logfile="${MDB_LOGFILE:-${logfile:-merovingian.log}}"
     export snapshotdir="${MDB_SNAPSHOTDIR:-${snapshotdir}}"
     export snapshotcompression="${MDB_SNAPSHOTDIR:-${snapshotcompression}}"
 
