@@ -28,7 +28,7 @@ setup_environment () {
     export daemon_pass="${MDB_DAEMONPASS:-${daemon_pass:-monetdb}}"
     export logfile="${MDB_LOGFILE:-${logfile:-merovingian.log}}"
     export snapshotdir="${MDB_SNAPSHOTDIR:-${snapshotdir}}"
-    export snapshotcompression="${MDB_SNAPSHOTDIR:-${snapshotcompression}}"
+    export snapshotcompression="${MDB_SNAPSHOTCOMPRESSION:-${snapshotcompression}}"
 
     # Write everything back to the file.
     truncate -s 0 "${farm_dir}/.container_env"
