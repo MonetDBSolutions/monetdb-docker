@@ -1,4 +1,4 @@
-FROM ubuntu:20.04 as build
+FROM ubuntu:22.04 as build
 
 ARG BRANCH=geo-update
 
@@ -34,7 +34,7 @@ RUN cmake .. \
 RUN cmake --build . -j
 RUN cmake --build . --target install
 
-FROM ubuntu:20.04 as runtime
+FROM ubuntu:22.04 as runtime
 
 # install monetdb runtime dependencies
 # TODO: which of these dependencies is actually necessary?
@@ -42,7 +42,7 @@ RUN apt-get update && \
     DEBIAN_FRONTEND="noninteractive" \
     TZ="Europe/Amsterdam" \
     apt-get install -y libcurl4-gnutls-dev readline-common \
-                       libpcre3 libssl1.1 libgdal-dev \
+                       libpcre3 libssl3 libgdal-dev \
                        gdal-bin libgeos-dev  && \
     rm -rf /var/lib/apt
 
