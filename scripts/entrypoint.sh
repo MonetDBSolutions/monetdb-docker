@@ -36,6 +36,7 @@ setup_environment () {
     export logfile="${MDB_LOGFILE:-${logfile:-merovingian.log}}"
     export snapshotdir="${MDB_SNAPSHOTDIR:-${snapshotdir}}"
     export snapshotcompression="${MDB_SNAPSHOTCOMPRESSION:-${snapshotcompression}}"
+    export adminpass="${MDB_ADMINPASS:-${adminpass:-monetdb}}"
 
     # Write everything back to the file.
     truncate -s 0 "${farm_dir}/.container_env"
@@ -43,6 +44,7 @@ setup_environment () {
     echo "export logfile=${logfile}" >> "${farm_dir}/.container_env"
     echo "export snapshotdir=${snapshotdir}" >> "${farm_dir}/.container_env"
     echo "export snapshotcompression=${snapshotcompression}" >> "${farm_dir}/.container_env"
+    echo "export adminpass=${adminpass}" >> "${farm_dir}/.container_env"
 
 }
 
@@ -72,8 +74,24 @@ setup_properties () {
 
 }
 
+create_dbs () {
+    if [[ -n "${MDB_STARTDBS}" && ! -e "${farm_dir}/.docker_initialized" ]];
+    then
+        monetdbd start "${farm_dir}"
+        IFS=','
+        read -ra dbs <<< "${MDB_STARTDBS}"
+        for db in "${dbs[@]}";
+        do
+            monetdb create -p "${adminpass}" "${db}"
+        done
+        monetdbd stop "${farm_dir}"
+        touch "${farm_dir}/.docker_initialized"
+    fi
+}
+
 setup_environment
 create_dbfarm
 setup_properties
+create_dbs
 echo "Starting MonetDB daemon"
 monetdbd start -n "${farm_dir}"
