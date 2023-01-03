@@ -27,6 +27,7 @@ setup_environment () {
     # - logfile
     # - snapshotdir
     # - snapshotcompression
+    # - adminpass
     [[ -e "${farm_dir}/.container_env" ]] && source "${farm_dir}/.container_env"
 
 
