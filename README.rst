@@ -31,7 +31,6 @@ variables (i.e. passed using the ``-e`` docker flag) that will
 configure the behavior of the container.
 
 MDB_DAEMONPASS
-   
    This is the passphrase used to contact the MonetDB daemon remotely,
    i.e. from outside the container. For example::
 
@@ -41,13 +40,11 @@ MDB_DAEMONPASS
    different value explicitly.
 
 MDB_LOGFILE
-   
    The file where the daemon should write the log messages. By default
    it’s the file ``merovingian.log`` relative to the database farm
    directory in the container.
 
 MDB_SNAPSHOTDIR
-
    This is the directory in the container where database snapshots
    will be written. If no value is given the daemon will not produce
    any snapshots. You can mount a local directory in order to have
