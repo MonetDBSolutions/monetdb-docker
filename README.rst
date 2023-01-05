@@ -30,7 +30,7 @@ The image accepts a number of parameters in the form of environment
 variables (i.e. passed using the ``-e`` docker flag) that will
 configure the behavior of the container.
 
-:MDB_DAEMONPASS:
+MDB_DAEMONPASS
    
    This is the passphrase used to contact the MonetDB daemon remotely,
    i.e. from outside the container. For example::
@@ -40,32 +40,29 @@ configure the behavior of the container.
    The default value is ``monetdb`` but we *strongly* advise you to set a
    different value explicitly.
 
-:MDB_LOGFILE:
+MDB_LOGFILE
    
    The file where the daemon should write the log messages. By default
    it’s the file ``merovingian.log`` relative to the database farm
    directory in the container.
 
-:MDB_SNAPSHOTDIR:
+MDB_SNAPSHOTDIR
 
    This is the directory in the container where database snapshots
    will be written. If no value is given the daemon will not produce
    any snapshots. You can mount a local directory in order to have
    access to the snapshots from the local host.
 
-:MDB_SNAPSHOTCOMPRESSION:
-
+MDB_SNAPSHOTCOMPRESSION
    This specifies the compression algorithm to be used for snapshot
    files. Default value is ``.tar.lz4`` and the other possible values are
    ``.tar``, ``.tar.gz``, ``.tar.xz`` and ``.tar.bz2``.
 
-:MDB_STARTDBS:
-
+MDB_STARTDBS
    This specifies what databases to build the first time the container
    comes up.
 
-:MDB_ADMINPASS:
-
+MDB_ADMINPASS
    The password to use for the ``monetdb`` (admin) user in the created
    databases. By default it is ``monetdb`` but we *strongly* advise
    you to set a different password.
@@ -79,6 +76,8 @@ Once the image is running you can get a shell in it::
 ---------------
 Manual building
 ---------------
+
+Clone this git repository_ and
 
 Building
 --------
