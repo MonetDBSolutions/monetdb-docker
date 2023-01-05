@@ -74,11 +74,8 @@ Once the image is running you can get a shell in it::
 Manual building
 ---------------
 
-Clone this git repository_ and
+Clone this git repository_ and run::
 
-Building
---------
-Building the image locally is very easy::
+  docker build . -t <local tag>
 
-  docker build . -t local_monetdb
-
+.. _repository: https://github.com/MonetDBSolutions/monetdb-docker
