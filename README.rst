@@ -30,7 +30,7 @@ The image accepts a number of parameters in the form of environment
 variables (i.e. passed using the ``-e`` docker flag) that will
 configure the behavior of the container.
 
-MDB_DAEMONPASS
+MDB_DAEMON_PASS
    This is the passphrase used to contact the MonetDB daemon remotely,
    i.e. from outside the container. For example::
 
@@ -44,25 +44,28 @@ MDB_LOGFILE
    it’s the file ``merovingian.log`` relative to the database farm
    directory in the container.
 
-MDB_SNAPSHOTDIR
+MDB_SNAPSHOT_DIR
    This is the directory in the container where database snapshots
    will be written. If no value is given the daemon will not produce
    any snapshots. You can mount a local directory in order to have
    access to the snapshots from the local host.
 
-MDB_SNAPSHOTCOMPRESSION
+MDB_SNAPSHOT_COMPRESSION
    This specifies the compression algorithm to be used for snapshot
    files. Default value is ``.tar.lz4`` and the other possible values are
    ``.tar``, ``.tar.gz``, ``.tar.xz`` and ``.tar.bz2``.
 
-MDB_STARTDBS
+MDB_CREATED_DBS
    This specifies what databases to build the first time the container
-   comes up.
+   comes up. You can specify multiple databases by separating their
+   names with a single comma character (no spaces between them)::
+     [...] -e MDB_CREATED_DBS=db1,db2,db3 [...]
 
-MDB_ADMINPASS
+MDB_DB_ADMIN_PASS
    The password to use for the ``monetdb`` (admin) user in the created
    databases. By default it is ``monetdb`` but we *strongly* advise
-   you to set a different password.
+   you to set a different password. Please note that all the databases
+   get the same admin password.
 
 Access
 ------
@@ -70,12 +73,15 @@ Once the image is running you can get a shell in it::
 
   docker exec -it <image_name> bash
 
----------------
-Manual building
----------------
+---------------------------
+Building the image manually
+---------------------------
 
 Clone this git repository_ and run::
 
   docker build . -t <local tag>
+
+Then you can use the image you just built as described in section
+`Usage`_ above.
 
 .. _repository: https://github.com/MonetDBSolutions/monetdb-docker

@@ -25,28 +25,26 @@ setup_environment () {
     # First we source the env file if it exists. This will define the variables:
     # - daemon_pass
     # - logfile
-    # - snapshotdir
-    # - snapshotcompression
-    # - adminpass
+    # - snapshot_dir
+    # - snapshot_compression
+    # - db_admin_pass
     [[ -e "${farm_dir}/.container_env" ]] && source "${farm_dir}/.container_env"
 
 
     # We update the variables in case the user passed new values at
     # the command line.
-    export daemon_pass="${MDB_DAEMONPASS:-${daemon_pass:-monetdb}}"
+    export daemon_pass="${MDB_DAEMON_PASS:-${daemon_pass:-monetdb}}"
     export logfile="${MDB_LOGFILE:-${logfile:-merovingian.log}}"
-    export snapshotdir="${MDB_SNAPSHOTDIR:-${snapshotdir}}"
-    export snapshotcompression="${MDB_SNAPSHOTCOMPRESSION:-${snapshotcompression}}"
-    export adminpass="${MDB_ADMINPASS:-${adminpass:-monetdb}}"
+    export snapshot_dir="${MDB_SNAPSHOT_DIR:-${snapshot_dir}}"
+    export snapshot_compression="${MDB_SNAPSHOT_COMPRESSION:-${snapshot_compression}}"
 
     # Write everything back to the file.
     truncate -s 0 "${farm_dir}/.container_env"
     echo "export daemon_pass=${daemon_pass}" >> "${farm_dir}/.container_env"
     echo "export logfile=${logfile}" >> "${farm_dir}/.container_env"
-    echo "export snapshotdir=${snapshotdir}" >> "${farm_dir}/.container_env"
-    echo "export snapshotcompression=${snapshotcompression}" >> "${farm_dir}/.container_env"
-    echo "export adminpass=${adminpass}" >> "${farm_dir}/.container_env"
-
+    echo "export snapshot_dir=${snapshot_dir}" >> "${farm_dir}/.container_env"
+    echo "export snapshot_compression=${snapshot_compression}" >> "${farm_dir}/.container_env"
+    # We do not record the variables created_dbs and db_admin_pass
 }
 
 create_dbfarm () {
@@ -61,13 +59,14 @@ create_dbfarm () {
 
 setup_properties () {
     source "${farm_dir}/.container_env"
+    echo "${MDB_DB_ADMIN_PASS}"
 
     monetdbd set listenaddr=all "$farm_dir"
     monetdbd set control=true "$farm_dir"
     monetdbd set passphrase="$daemon_pass" "$farm_dir"
     monetdbd set logfile="$logfile" "$farm_dir"
-    monetdbd set snapshotdir="$snapshotdir" "$farm_dir"
-    monetdbd set snapshotcompression="$snapshotcompression" "$farm_dir"
+    monetdbd set snapshotdir="$snapshot_dir" "$farm_dir"
+    monetdbd set snapshotcompression="$snapshot_compression" "$farm_dir"
 
     if [[ "${MDB_SHOW_VARS:-}" ]]; then
         monetdbd get all "$farm_dir"
@@ -76,14 +75,15 @@ setup_properties () {
 }
 
 create_dbs () {
-    if [[ -n "${MDB_STARTDBS}" && ! -e "${farm_dir}/.docker_initialized" ]];
+    if [[ -n "${MDB_CREATED_DBS}" && ! -e "${farm_dir}/.docker_initialized" ]];
     then
+        db_admin_pass="${MDB_DB_ADMIN_PASS:-monetdb}"
         monetdbd start "${farm_dir}"
         IFS=','
-        read -ra dbs <<< "${MDB_STARTDBS}"
+        read -ra dbs <<< "${MDB_CREATED_DBS}"
         for db in "${dbs[@]}";
         do
-            monetdb create -p "${adminpass}" "${db}"
+            monetdb create -p "${db_admin_pass}" "${db}"
         done
         monetdbd stop "${farm_dir}"
         touch "${farm_dir}/.docker_initialized"
