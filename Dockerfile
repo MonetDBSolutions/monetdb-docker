@@ -6,7 +6,9 @@
 # Copyright 1997 - July 2008 CWI, August 2008 - 2023 MonetDB B.V.
 
 FROM fedora:latest
-MAINTAINER Svetlin Stalinov, svetlin.stalinov@monetdbsolutions.com
+
+LABEL org.opencontainers.image.authors="svetlin.stalinov@monetdbsolutions.com"
+
 
 ARG enablerepo
 
