@@ -1,98 +1,111 @@
 #!/usr/bin/env bash
 
-# This Source Code Form is subject to the terms of the Mozilla
-# Public License, v. 2.0. If a copy of the MPL was not
-# distributed with this file, You can obtain one at
-# https://mozilla.org/MPL/2.0/.
-#
-# Copyright 1997 - July 2008 CWI, August 2008 - 2023 MonetDB B.V.
-
-set -eo pipefail
+set -e -o pipefail -o nounset
 set +x
 
 
-# We need to set a number of properties, but we also need to remember
-# them next time the container comes up. The consequence is that we
-# need to keep them in a constant location. We will have the
-# convention that the dbfarm is always located at
-# /var/monetdb5/dbfarm/ inside the container and we will save the
-# values in the file /var/monetdb5/dbfarm/.container_env. We will
-# source it at startup in order to define them in the environment.
+farm_dir="${1?Please pass argument FARM_DIR}"
+if [[ -z "$farm_dir" ]]; then
+    echo "FARM_DIR must not be empty"
+    exit 1
+fi
 
-export farm_dir=/var/monetdb5/dbfarm/
+# Read the settings out of the environment. Place them in shell variables but do
+# not export them so no secrets get exposed in the output of the 'ps' command.
+configure () {
+    logfile="${MDB_LOGFILE:-merovingian.log}"
+    snapshotdir="${MDB_SNAPSHOT_DIR:-}"
+    snapshotcompression="${MDB_SNAPSHOT_COMPRESSION:-}"
+    show_vars="${MDB_SHOW_VARS:-}"
 
-setup_environment () {
-    # First we source the env file if it exists. This will define the variables:
-    # - daemon_pass
-    # - logfile
-    # - snapshot_dir
-    # - snapshot_compression
-    # - db_admin_pass
-    [[ -e "${farm_dir}/.container_env" ]] && source "${farm_dir}/.container_env"
+    if [[ -n "${MDB_DAEMON_PASS_FILE:-}" ]]; then
+        passphrase="$(head -1 "$MDB_DAEMON_PASS_FILE")"
+    else
+        passphrase="${MDB_DAEMON_PASS:-}"
+    fi
+    if [[ -n "${MDB_DB_ADMIN_PASS_FILE:-}" ]]; then
+        admin_pass="$(head -1 "$MDB_DB_ADMIN_PASS_FILE")"
+    else
+        admin_pass="${MDB_DB_ADMIN_PASS:-}"
+    fi
 
-
-    # We update the variables in case the user passed new values at
-    # the command line.
-    export daemon_pass="${MDB_DAEMON_PASS:-${daemon_pass:-monetdb}}"
-    export logfile="${MDB_LOGFILE:-${logfile:-merovingian.log}}"
-    export snapshot_dir="${MDB_SNAPSHOT_DIR:-${snapshot_dir}}"
-    export snapshot_compression="${MDB_SNAPSHOT_COMPRESSION:-${snapshot_compression}}"
-
-    # Write everything back to the file.
-    truncate -s 0 "${farm_dir}/.container_env"
-    echo "export daemon_pass=${daemon_pass}" >> "${farm_dir}/.container_env"
-    echo "export logfile=${logfile}" >> "${farm_dir}/.container_env"
-    echo "export snapshot_dir=${snapshot_dir}" >> "${farm_dir}/.container_env"
-    echo "export snapshot_compression=${snapshot_compression}" >> "${farm_dir}/.container_env"
-    # We do not record the variables created_dbs and db_admin_pass
+    # Figure out which databases to create.
+    # Note the -n ${+} trick, which makes sure it works correctly if the
+    # variable is set to the empty string
+    if [[ -n "${MDB_CREATE_DBS+x}" ]]; then
+        tmp_dbs="$MDB_CREATE_DBS"
+    elif [[ -n "${MDB_CREATED_DBS+x}" ]]; then
+        tmp_dbs="$MDB_CREATED_DBS"
+    else
+        tmp_dbs="monetdb"
+    fi
+    if [[ -n "$tmp_dbs" && -z "$admin_pass" ]]; then
+        echo "Please use MDB_DB_ADMIN_PASS or MBD_DB_ADMIN_PASS_FILE to"
+        echo "set a database admin password for '$tmp_dbs'."
+        echo "Alternatively, set MDB_CREATE_DBS to ''."
+        exit 1
+    fi
+    # split on commas and store the result in create_dbs
+    IFS=',' read -ra create_dbs <<< "$tmp_dbs"
 }
 
 create_dbfarm () {
-    source "${farm_dir}/.container_env"
-
-    if [[ ! -e "${farm_dir}/.merovingian_properties" ]]; then
-        mkdir -p "${farm_dir}"
-        monetdbd create "${farm_dir}"
-        echo "Created db farm at ${farm_dir}"
+    if [[ -f "$farm_dir"/.merovingian_properties ]]; then
+        return
     fi
+    echo "Creating db farm at ${farm_dir}"
+    mkdir -p "${farm_dir}"
+    monetdbd create "${farm_dir}"
 }
 
-setup_properties () {
-    source "${farm_dir}/.container_env"
-    echo "${MDB_DB_ADMIN_PASS}"
+set_properties () {
+    # do not set listenaddr, control and passphrase here
+    monetdbd set "logfile=$logfile" "$farm_dir"
+    monetdbd set "snapshotdir=$snapshotdir" "$farm_dir"
+    monetdbd set "snapshotcompression=$snapshotcompression" "$farm_dir"
+}
 
-    monetdbd set listenaddr=all "$farm_dir"
+create_databases () {
+    monetdbd start "${farm_dir}"
+    for db in "${create_dbs[@]}"; do
+        echo "Creating database '$db'"
+        monetdb create -p "$admin_pass" "$db"
+    done
+    monetdbd stop "${farm_dir}"
+}
+
+enable_control () {
+    monetdbd set passphrase="$passphrase" "$farm_dir"
     monetdbd set control=true "$farm_dir"
-    monetdbd set passphrase="$daemon_pass" "$farm_dir"
-    monetdbd set logfile="$logfile" "$farm_dir"
-    monetdbd set snapshotdir="$snapshot_dir" "$farm_dir"
-    monetdbd set snapshotcompression="$snapshot_compression" "$farm_dir"
-
-    if [[ "${MDB_SHOW_VARS:-}" ]]; then
-        monetdbd get all "$farm_dir"
-    fi
-
 }
 
-create_dbs () {
-    if [[ -n "${MDB_CREATED_DBS}" && ! -e "${farm_dir}/.docker_initialized" ]];
-    then
-        db_admin_pass="${MDB_DB_ADMIN_PASS:-monetdb}"
-        monetdbd start "${farm_dir}"
-        IFS=','
-        read -ra dbs <<< "${MDB_CREATED_DBS}"
-        for db in "${dbs[@]}";
-        do
-            monetdb create -p "${db_admin_pass}" "${db}"
-        done
-        monetdbd stop "${farm_dir}"
-        touch "${farm_dir}/.docker_initialized"
-    fi
-}
 
-setup_environment
-create_dbfarm
-setup_properties
-create_dbs
+configure
+
+if [[ ! -f "$farm_dir"/.container_initialized ]]; then
+
+    create_dbfarm
+
+    set_properties
+
+    if [[ -n "$admin_pass" ]]; then
+        create_databases
+    fi
+
+    if [[ -n "$passphrase" ]]; then
+        enable_control
+    fi
+
+    # only start listening to the outside world when all expected databases
+    # have been created
+    monetdbd set listenaddr=all "$farm_dir"
+
+    touch "$farm_dir"/.container_initialized
+fi
+
+if [[ -n "$show_vars" ]]; then
+    monetdbd get all "$farm_dir"
+fi
+
 echo "Starting MonetDB daemon"
-monetdbd start -n "${farm_dir}"
+monetdbd start -n "$farm_dir"

@@ -46,6 +46,6 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 
 EXPOSE 50000
 
-ENTRYPOINT ["entrypoint.sh"]
+ENTRYPOINT [ "entrypoint.sh", "/var/monetdb5/dbfarm" ]
 
 STOPSIGNAL SIGINT
