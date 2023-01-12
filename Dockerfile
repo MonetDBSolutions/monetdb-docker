@@ -45,6 +45,6 @@ COPY scripts/entrypoint.sh /usr/local/bin
 
 EXPOSE 50000
 
-ENTRYPOINT [ "entrypoint.sh", "/var/monetdb5/dbfarm" ]
+ENTRYPOINT [ "entrypoint.sh" ]
 
 STOPSIGNAL SIGINT

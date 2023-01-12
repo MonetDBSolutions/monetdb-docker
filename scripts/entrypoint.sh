@@ -11,9 +11,9 @@ set -e -o pipefail -o nounset
 set +x
 
 
-farm_dir="${1?Please pass argument FARM_DIR}"
+farm_dir="${MDB_FARM_DIR-/var/monetdb5/dbfarm}"
 if [[ -z "$farm_dir" ]]; then
-    echo "FARM_DIR must not be empty"
+    echo "MDB_FARM_DIR must not be empty"
     exit 1
 fi
 
