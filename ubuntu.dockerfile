@@ -51,3 +51,7 @@ COPY --from=build /usr/local /usr/local
 
 # add shared libraries to wheels
 ENV LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:/usr/local/lib"
+
+COPY scripts/entrypoint.sh /usr/local/bin
+
+CMD [ "entrypoint.sh" ]
