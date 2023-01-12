@@ -71,9 +71,6 @@ MDB_CREATE_DBS
 
    If this variable is not empty, MDB_DB_ADMIN_PASS must also be set.
 
-MDB_CREATED_DBS
-   Deprecated, use MDB_CREATE_DBS instead.
-
 MDB_DB_ADMIN_PASS
    The password to use for the ``monetdb`` (admin) user in the
    databases created through MDB_CREATE_DBS. Note that all the databases

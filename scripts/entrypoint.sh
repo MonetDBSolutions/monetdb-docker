@@ -37,19 +37,10 @@ configure () {
     fi
 
     # Figure out which databases to create.
-    # Note the -n ${+} trick, which makes sure it works correctly if the
-    # variable is set to the empty string
-    if [[ -n "${MDB_CREATE_DBS+x}" ]]; then
-        tmp_dbs="$MDB_CREATE_DBS"
-    elif [[ -n "${MDB_CREATED_DBS+x}" ]]; then
-        tmp_dbs="$MDB_CREATED_DBS"
-    else
-        tmp_dbs="monetdb"
-    fi
+    tmp_dbs="${MDB_CREATE_DBS-monetdb}"
     if [[ -n "$tmp_dbs" && -z "$admin_pass" ]]; then
-        echo "Please use MDB_DB_ADMIN_PASS or MBD_DB_ADMIN_PASS_FILE to"
-        echo "set a database admin password for '$tmp_dbs'."
-        echo "Alternatively, set MDB_CREATE_DBS to ''."
+        echo "Please use MDB_DB_ADMIN_PASS or MBD_DB_ADMIN_PASS_FILE to set a database admin"
+        echo "password for '$tmp_dbs'.  Alternatively, set MDB_CREATE_DBS to ''."
         exit 1
     fi
     # split on commas and store the result in create_dbs
@@ -66,7 +57,7 @@ create_dbfarm () {
 }
 
 set_properties () {
-    # do not set listenaddr, control and passphrase here
+    # do not set listenaddr, control and passphrase here, this will happen later
     monetdbd set "logfile=$logfile" "$farm_dir"
     monetdbd set "snapshotdir=$snapshotdir" "$farm_dir"
     monetdbd set "snapshotcompression=$snapshotcompression" "$farm_dir"
