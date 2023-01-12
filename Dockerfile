@@ -8,6 +8,8 @@
 FROM fedora:latest
 MAINTAINER Svetlin Stalinov, svetlin.stalinov@monetdbsolutions.com
 
+ARG enablerepo
+
 # Create users and groups
 RUN groupadd -g 5000 monetdb && \
     useradd -u 5000 -g 5000 monetdb
@@ -23,6 +25,7 @@ RUN dnf install -y https://dev.monetdb.org/downloads/Fedora/MonetDB-release.noar
 
 # Install MonetDB packages
 RUN dnf install -y --best \
+    $(if [ -n "$enablerepo" ]; then echo "--enablerepo=${enablerepo}"; fi) \
     MonetDB-SQL-server5 MonetDB-client \
     MonetDB-cfitsio MonetDB-geom-MonetDB5\
     MonetDB-python3
