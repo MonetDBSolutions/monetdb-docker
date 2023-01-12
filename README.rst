@@ -30,6 +30,10 @@ The image accepts a number of parameters in the form of environment
 variables (i.e. passed using the ``-e`` docker flag) that will
 configure the behavior of the container.
 
+MDB_FARM_DIR
+   The location of the database farm. Defaults to /var/monetdb5/dbfarm.
+   If unset, no farm will be created and no MonetDB daemon will be started.
+
 MDB_DAEMON_PASS
    This is the passphrase used to manage the farm from outside the container.
    For example::

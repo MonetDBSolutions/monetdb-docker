@@ -10,11 +10,11 @@
 set -e -o pipefail -o nounset
 set +x
 
-
+# If MDB_FARM_DIR is set to the empty string this whole script
+# becomes a no-op.
 farm_dir="${MDB_FARM_DIR-/var/monetdb5/dbfarm}"
 if [[ -z "$farm_dir" ]]; then
-    echo "MDB_FARM_DIR must not be empty"
-    exit 1
+    exit
 fi
 
 # Read the settings out of the environment. Place them in shell variables but do
