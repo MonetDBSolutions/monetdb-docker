@@ -6,7 +6,9 @@
 # Copyright 1997 - July 2008 CWI, August 2008 - 2023 MonetDB B.V.
 
 FROM fedora:latest
-MAINTAINER Svetlin Stalinov, svetlin.stalinov@monetdbsolutions.com
+
+LABEL org.opencontainers.image.authors="svetlin.stalinov@monetdbsolutions.com"
+
 
 ARG enablerepo
 
@@ -40,10 +42,9 @@ RUN rm -rf /tmp/* /var/tmp/*
 # Setup MonetDB
 #######################################################
 COPY scripts/entrypoint.sh /usr/local/bin
-RUN chmod +x /usr/local/bin/entrypoint.sh
 
 EXPOSE 50000
 
-ENTRYPOINT ["entrypoint.sh"]
+ENTRYPOINT [ "entrypoint.sh" ]
 
 STOPSIGNAL SIGINT
