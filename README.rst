@@ -9,11 +9,9 @@ Docker container for MonetDB_.
 Usage
 -----
 The simplest way to start a MonetDB container is to use the images
-published on DockerHub_::
+published on `Docker Hub`_::
 
   docker run -P -it monetdb/monetdb:latest
-
-.. _DockerHub: https://hub.docker.com/repository/docker/monetdb/monetdb/tags
 
 This command will start a container from the latest tagged image on
 docker hub and it will map a random port on localhost to the port
@@ -47,7 +45,11 @@ MDB_DAEMON_PASS
 
 MDB_DAEMON_PASS_FILE
    Variant of MDB_DAEMON_PASS. Path to a file inside the container that contains
-   the daemon password.
+   the daemon password on the first line.
+
+   This can be used for example with `Docker swarm secrets`_ or `Kubernetes
+   secrets management`_, or manually by mounting a volume that contains
+   the password file.
 
 MDB_LOGFILE
    The file where the daemon should write the log messages. By default
@@ -69,6 +71,7 @@ MDB_CREATE_DBS
    This specifies databases to be created the first time the container
    comes up. You can specify multiple databases by separating their
    names with a single comma character (no spaces between them)::
+
      [...] -e MDB_CREATE_DBS=db1,db2,db3 [...]
 
    The default is 'monetdb'.
@@ -87,7 +90,11 @@ MDB_DB_ADMIN_PASS
 
 MDB_DB_ADMIN_PASS_FILE
    Variant of MDB_DB_ADMIN_PASS. Path to a file inside the container that contains
-   the daemon password.
+   the daemon password on the first line.
+
+   This can be used for example with `Docker swarm secrets`_ or `Kubernetes
+   secrets management`_, or manually by mounting a volume that contains
+   the password file.
 
 
 Access
@@ -108,3 +115,10 @@ Then you can use the image you just built as described in section
 `Usage`_ above.
 
 .. _repository: https://github.com/MonetDBSolutions/monetdb-docker
+
+.. _Docker Hub: https://hub.docker.com/repository/docker/monetdb/monetdb/tags
+
+.. _Docker swarm secrets: https://docs.docker.com/engine/swarm/secrets/#how-docker-manages-secrets
+
+.. _Kubernetes secrets management: https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-files-from-a-pod
+
