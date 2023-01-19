@@ -10,11 +10,13 @@
 set -e -o pipefail -o nounset
 set +x
 
-# If MDB_FARM_DIR is set to the empty string this whole script
-# becomes a no-op.
 farm_dir="${MDB_FARM_DIR-/var/monetdb5/dbfarm}"
+
+# If MDB_FARM_DIR is set to the empty string just use the default
+# directory, after warning the user.
 if [[ -z "$farm_dir" ]]; then
-    exit
+    farm_dir="/var/monetdb5/dbfarm"
+    echo "MDB_FARM_DIR set to an empty string. Using the default value of '$farm_dir'."
 fi
 
 # Read the settings out of the environment. Place them in shell variables but do

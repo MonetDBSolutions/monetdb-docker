@@ -45,6 +45,6 @@ COPY scripts/entrypoint.sh /usr/local/bin
 
 EXPOSE 50000
 
-ENTRYPOINT [ "entrypoint.sh" ]
+CMD [ "entrypoint.sh" ]
 
 STOPSIGNAL SIGINT
