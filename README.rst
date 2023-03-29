@@ -95,7 +95,7 @@ MDB_DB_ADMIN_PASS_FILE
    secrets management`_, or manually by mounting a volume that contains
    the password file.
 
-.. note:
+.. note::
 
    There are situations where error messages produced at the startup
    of the container are not immediately visible. For example when
