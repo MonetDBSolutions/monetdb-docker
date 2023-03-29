@@ -103,9 +103,9 @@ MDB_DB_ADMIN_PASS_FILE
    the job in the section ``Stop containers``.
 
    Another similar situation is at the command line when the container
-   is created in two steps using the commands `docker create` and
-   `docker start`. In that case you can access the error messages
-   using the command `docker logs <container name>`.
+   is created in two steps using the commands ``docker create`` and
+   ``docker start``. In that case you can access the error messages
+   using the command ``docker logs <container name>``.
 
 Access
 ------
