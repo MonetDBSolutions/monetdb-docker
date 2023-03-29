@@ -29,7 +29,7 @@ variables (i.e. passed using the ``-e`` docker flag) that will
 configure the behavior of the container.
 
 MDB_FARM_DIR
-   The location of the database farm. Defaults to /var/monetdb5/dbfarm.
+   The location of the database farm. Defaults to ``/var/monetdb5/dbfarm``.
 
 MDB_DAEMON_PASS
    This is the passphrase used to manage the farm from outside the container.
@@ -73,7 +73,7 @@ MDB_CREATE_DBS
 
      [...] -e MDB_CREATE_DBS=db1,db2,db3 [...]
 
-   The default is 'monetdb'.
+   The default is ``monetdb``.
 
    If this variable is not empty, MDB_DB_ADMIN_PASS must also be set.
 
@@ -95,6 +95,17 @@ MDB_DB_ADMIN_PASS_FILE
    secrets management`_, or manually by mounting a volume that contains
    the password file.
 
+.. note:
+
+   There are situations where error messages produced at the startup
+   of the container are not immediately visible. For example when
+   using Github Actions, any error messages are shown at the end of
+   the job in the section ``Stop containers``.
+
+   Another similar situation is at the command line when the container
+   is created in two steps using the commands `docker create` and
+   `docker start`. In that case you can access the error messages
+   using the command `docker logs <container name>`.
 
 Access
 ------
