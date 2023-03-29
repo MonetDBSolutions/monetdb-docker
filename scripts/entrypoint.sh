@@ -22,6 +22,26 @@ fi
 # Read the settings out of the environment. Place them in shell variables but do
 # not export them so no secrets get exposed in the output of the 'ps' command.
 configure () {
+
+    # Check for misspelled config variables
+    env | sed -n -e 's/=.*//' -e '/^MDB_/p' | while read varname; do
+    case "$varname" in
+        MDB_SHOW_VARS) ;;
+        MDB_CREATE_DBS) ;;
+        MDB_DB_ADMIN_PASS) ;;
+        MDB_DB_ADMIN_PASS_FILE) ;;
+        MDB_DAEMON_PASS) ;;
+        MDB_DAEMON_PASS_FILE) ;;
+        MDB_LOGFILE) ;;
+        MDB_SNAPSHOT_DIR) ;;
+        MDB_FARM_DIR) ;;
+        MDB_SNAPSHOT_COMPRESSION) ;;
+        *)
+            echo "Warning: unused MDB_ variable $varname"
+            ;;
+    esac
+    done
+
     logfile="${MDB_LOGFILE:-merovingian.log}"
     snapshotdir="${MDB_SNAPSHOT_DIR:-}"
     snapshotcompression="${MDB_SNAPSHOT_COMPRESSION:-}"
