@@ -22,6 +22,9 @@ RUN dnf upgrade -y
 # Install compression schemes
 RUN dnf install -y xz bzip2 lz4 gzip
 
+# Temporary fix for missing numpy.
+RUN dnf install -y python3-numpy
+
 # install MonetDB
 RUN dnf install -y https://dev.monetdb.org/downloads/Fedora/MonetDB-release.noarch.rpm
 
