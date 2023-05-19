@@ -36,6 +36,8 @@ configure () {
         MDB_SNAPSHOT_DIR) ;;
         MDB_FARM_DIR) ;;
         MDB_SNAPSHOT_COMPRESSION) ;;
+        MDB_FARM_PROPERTIES) ;;
+        MDB_DB_PROPERTIES) ;;
         *)
             echo "Warning: unused MDB_ variable $varname"
             ;;
@@ -67,6 +69,16 @@ configure () {
     fi
     # split on commas and store the result in create_dbs
     IFS=',' read -ra create_dbs <<< "$tmp_dbs"
+
+    farm_props=
+    if [[ -n "${MDB_FARM_PROPERTIES:-}" ]]; then
+       IFS=',' read -ra farm_props <<< "${MDB_FARM_PROPERTIES}"
+    fi
+
+    db_props=
+    if [[ -n "${MDB_DB_PROPERTIES:-}" ]]; then
+        IFS=',' read -ra db_props <<< "${MDB_DB_PROPERTIES}"
+    fi
 }
 
 create_dbfarm () {
@@ -83,6 +95,11 @@ set_properties () {
     monetdbd set "logfile=$logfile" "$farm_dir"
     monetdbd set "snapshotdir=$snapshotdir" "$farm_dir"
     monetdbd set "snapshotcompression=$snapshotcompression" "$farm_dir"
+    for prop in "${farm_props[@]}"; do
+        if [[ ! "$prop" =~ ^listenaddr.*|^control.*|^passphrase.* ]]; then
+            monetdbd set "$prop" "$farm_dir"
+        fi
+    done
 }
 
 create_databases () {
@@ -90,6 +107,9 @@ create_databases () {
     for db in "${create_dbs[@]}"; do
         echo "Creating database '$db'"
         monetdb create -p "$admin_pass" "$db"
+        for prop in "${db_props[@]}"; do
+            monetdb set "$prop" "$db"
+        done
     done
     monetdbd stop "${farm_dir}"
 }
