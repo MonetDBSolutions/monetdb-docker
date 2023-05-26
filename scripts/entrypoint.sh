@@ -96,9 +96,17 @@ set_properties () {
     monetdbd set "snapshotdir=$snapshotdir" "$farm_dir"
     monetdbd set "snapshotcompression=$snapshotcompression" "$farm_dir"
     for prop in "${farm_props[@]}"; do
-        if [[ ! "$prop" =~ ^listenaddr.*|^control.*|^passphrase.* ]]; then
-            monetdbd set "$prop" "$farm_dir"
-        fi
+        case "$prop" in
+            listenaddr=*)
+            ;;
+            control=*)
+            ;;
+            passphrase=*)
+            ;;
+            *)
+                monetdbd set "$prop" "$farm_dir"
+                ;;
+        esac
     done
 }
 
