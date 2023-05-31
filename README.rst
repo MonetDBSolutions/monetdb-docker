@@ -37,10 +37,10 @@ MDB_DAEMON_PASS
 
     monetdb -h localhost -P <passphrase> create SF-1
 
-   See also MDB_DAEMON_PASS_FILE, which may be more secure.
+   See also ``MDB_DAEMON_PASS_FILE``, which may be more secure.
 
-   If neither MDB_DAEMON_PASS nor MDB_DAEMON_PASS_FILE are set,
-   the farm cannot be managed from outside the container
+   If neither ``MDB_DAEMON_PASS`` nor ``MDB_DAEMON_PASS_FILE`` are
+   set, the farm cannot be managed from outside the container
 
 MDB_DAEMON_PASS_FILE
    Variant of MDB_DAEMON_PASS. Path to a file inside the container that contains
@@ -95,6 +95,22 @@ MDB_DB_ADMIN_PASS_FILE
    secrets management`_, or manually by mounting a volume that contains
    the password file.
 
+MDB_FARM_PROPERTIES
+   A comma separated list of entries ``key=value`` to pass to the
+   database farm. This is used in order to set properties like
+   ``port``, ``exittimeout`` etc. See `monetdbd manual page`_ for the
+   full list of properties. Please note that the properties
+   ``listenaddr``, ``control`` and ``passphrase`` are not affected by
+   this variable. ``listenaddr`` is always set to ``all``, and the
+   other two are set appropriately by setting the variable
+   ``MDB_DAEMON_PASS`` or ``MDB_DAEMON_PASS_FILE``.
+
+MDB_DB_PROPERTIES
+   A comma separated list of entries ``key=value`` to pass to every
+   database specified in ``MDB_CREATE_DBS``. See the documentation of
+   the ``set`` sub-command in the  `monetdb manual page`_ for the full
+   list of properties.
+
 .. note::
 
    There are situations where error messages produced at the startup
@@ -132,3 +148,6 @@ Then you can use the image you just built as described in section
 
 .. _Kubernetes secrets management: https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-files-from-a-pod
 
+.. _monetdbd manual page: https://www.monetdb.org/documentation-Jul2021/admin-guide/manpages/monetdbd/
+
+.. _monetdb manual page: https://www.monetdb.org/documentation-Jul2021/admin-guide/manpages/monetdb/
