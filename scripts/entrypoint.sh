@@ -69,16 +69,8 @@ configure () {
     fi
     # split on commas and store the result in create_dbs
     IFS=',' read -ra create_dbs <<< "$tmp_dbs"
-
-    farm_props=
-    if [[ -n "${MDB_FARM_PROPERTIES:-}" ]]; then
-       IFS=',' read -ra farm_props <<< "${MDB_FARM_PROPERTIES}"
-    fi
-
-    db_props=
-    if [[ -n "${MDB_DB_PROPERTIES:-}" ]]; then
-        IFS=',' read -ra db_props <<< "${MDB_DB_PROPERTIES}"
-    fi
+    IFS=',' read -ra farm_props <<< "${MDB_FARM_PROPERTIES:-}"
+    IFS=',' read -ra db_props <<< "${MDB_DB_PROPERTIES:-}"
 }
 
 create_dbfarm () {
