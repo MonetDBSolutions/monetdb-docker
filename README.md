@@ -1,7 +1,7 @@
 # MonetDB Docker
 
 Docker container for [MonetDB](https://www.monetdb.org/). Dockerfile and
-scripts can be found the [MonetDB Docker
+scripts can be found in the [MonetDB Docker
 repo](https://github.com/MonetDBSolutions/monetdb-docker).
 
 ## Usage
