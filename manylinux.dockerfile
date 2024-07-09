@@ -5,7 +5,7 @@
 #
 # Copyright 1997 - July 2008 CWI, August 2008 - 2023 MonetDB B.V.
 
-FROM quay.io/pypa/manylinux2014_x86_64 as build
+FROM quay.io/pypa/manylinux_2_28_x86_64 as build
 
 ARG BRANCH=default
 ARG BUILD_THREADS=4
@@ -34,7 +34,7 @@ RUN cmake3 --build . --target install
 
 
 
-FROM quay.io/pypa/manylinux2014_x86_64 as runtime
+FROM quay.io/pypa/manylinux_2_28_x86_64 as runtime
 
 RUN rm -rf /usr/local
 COPY --from=build /usr/local /usr/local
