@@ -5,7 +5,9 @@
 #
 # Copyright 1997 - July 2008 CWI, August 2008 - 2024 MonetDB B.V.
 
-FROM ubuntu:20.04 as build
+ARG UBUNTU_VERSION=22.04
+
+FROM ubuntu:${UBUNTU_VERSION} as build
 
 ARG BRANCH=default
 ARG BUILD_THREADS=4
@@ -36,7 +38,7 @@ RUN cmake --build . --target install
 
 
 
-FROM ubuntu:20.04 as runtime
+FROM ubuntu:${UBUNTU_VERSION} as runtime
 
 # install monetdb build dependencies
 RUN apt-get update && \
