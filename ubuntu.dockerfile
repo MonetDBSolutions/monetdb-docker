@@ -42,7 +42,7 @@ FROM ubuntu:${UBUNTU_VERSION} as runtime
 
 # install monetdb build dependencies
 RUN apt-get update && \
-    apt-get install -y python3-pip libpcre3 libssl1.1 && \
+    apt-get install -y python3-pip libpcre3 && \
     rm -rf /var/lib/apt
 
 
