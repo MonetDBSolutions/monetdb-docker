@@ -26,13 +26,13 @@ RUN dnf install -y xz bzip2 lz4 gzip
 RUN dnf install -y python3-numpy
 
 # install MonetDB
-RUN dnf install -y https://dev.monetdb.org/downloads/Fedora/MonetDB-release.noarch.rpm
+RUN dnf install -y https://www.monetdb.org/downloads/Fedora/MonetDB-release.noarch.rpm
 
 # Install MonetDB packages
 RUN dnf install -y --best \
     $(if [ -n "$enablerepo" ]; then echo "--enablerepo=${enablerepo}"; fi) \
-    MonetDB-SQL-server5 MonetDB-client \
-    MonetDB-cfitsio MonetDB-geom-MonetDB5\
+    MonetDB-SQL MonetDB-client \
+    MonetDB-cfitsio MonetDB-geom \
     MonetDB-python3
 
 #######################################################
