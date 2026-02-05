@@ -3,9 +3,9 @@
 # distributed with this file, You can obtain one at
 # https://mozilla.org/MPL/2.0/.
 #
-# Copyright 1997 - July 2008 CWI, August 2008 - 2024 MonetDB B.V.
+# Copyright 1997 - July 2008 CWI, August 2008 - 2026 MonetDB B.V.
 
-ARG UBUNTU_VERSION=22.04
+ARG UBUNTU_VERSION=24.04
 
 FROM ubuntu:${UBUNTU_VERSION} as build
 
@@ -15,7 +15,7 @@ ENV DEBIAN_FRONTEND noninteractve
 
 # install monetdb build dependencies
 RUN apt-get update && \
-    apt-get install -y cmake bison libpcre3-dev libssl-dev curl python3 bzip2 && \
+    apt-get install -y cmake bison libpcre2-dev libssl-dev curl python3 bzip2 && \
     rm -rf /var/lib/apt/lists/*
 
 # download and extract monetdb
@@ -42,9 +42,14 @@ FROM ubuntu:${UBUNTU_VERSION} as runtime
 
 # install monetdb build dependencies
 RUN apt-get update && \
-    apt-get install -y python3-pip libpcre3 && \
+    apt-get install -y python3-pip libpcre3 python3-venv && \
     rm -rf /var/lib/apt
 
+# create the virtual environment
+RUN python3 -m venv /opt/venv
+
+# environment is used for all subsequent RUN commands
+ENV PATH="/opt/venv/bin:$PATH"
 
 RUN pip3 install --no-cache --upgrade pip pytest numpy pandas mypy pycodestyle
 
