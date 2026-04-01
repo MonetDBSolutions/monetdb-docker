@@ -14,9 +14,11 @@ ARG BUILD_THREADS=4
 ENV DEBIAN_FRONTEND noninteractve
 
 # install monetdb build dependencies
-RUN apt-get update && \
-    apt-get install -y cmake bison libpcre2-dev libssl-dev curl python3 bzip2 && \
-    rm -rf /var/lib/apt/lists/*
+RUN apt-get update \
+    && apt-get install -y \
+		cmake bison libpcre2-dev libssl-dev curl python3 bzip2 \
+		libbz2-dev liblz4-dev liblzma-dev zlib1g-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 # download and extract monetdb
 WORKDIR /tmp 
@@ -41,9 +43,11 @@ RUN cmake --build . --target install
 FROM ubuntu:${UBUNTU_VERSION} as runtime
 
 # install monetdb build dependencies
-RUN apt-get update && \
-    apt-get install -y python3-pip libpcre3 python3-venv && \
-    rm -rf /var/lib/apt
+RUN apt-get update \
+    && apt-get install -y \
+	python3-pip libpcre3 python3-venv \
+	libbz2-1.0 liblz4-1 liblzma5 zlib1g \
+    && rm -rf /var/lib/apt
 
 # create the virtual environment
 RUN python3 -m venv /opt/venv
