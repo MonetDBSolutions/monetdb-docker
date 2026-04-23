@@ -48,6 +48,8 @@ COPY scripts/entrypoint.sh /usr/local/bin
 
 EXPOSE 50000
 
+USER monetdb
+
 CMD [ "entrypoint.sh" ]
 
 STOPSIGNAL SIGINT
