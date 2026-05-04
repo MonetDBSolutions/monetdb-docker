@@ -13,6 +13,10 @@ ARG BRANCH=default
 ARG BUILD_THREADS=4
 ENV DEBIAN_FRONTEND noninteractve
 
+# Create users and groups
+RUN groupadd -g 5000 monetdb && \
+    useradd -u 5000 -g 5000 monetdb
+
 # install monetdb build dependencies
 RUN apt-get update \
     && apt-get install -y \
@@ -37,7 +41,6 @@ RUN cmake .. \
     -DRINTEGRATION=OFF
 RUN cmake --build . -j ${BUILD_THREADS}
 RUN cmake --build . --target install
-
 
 
 FROM ubuntu:${UBUNTU_VERSION} as runtime
@@ -66,5 +69,6 @@ ENV LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:/usr/local/lib"
 COPY scripts/entrypoint.sh /usr/local/bin
 
 EXPOSE 50000
+USER monetdb
 
 CMD [ "entrypoint.sh" ]

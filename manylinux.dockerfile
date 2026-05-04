@@ -10,6 +10,10 @@ FROM quay.io/pypa/manylinux_2_28_x86_64 as build
 ARG BRANCH=default
 ARG BUILD_THREADS=4
 
+# Create users and groups
+RUN groupadd -g 5000 monetdb && \
+    useradd -u 5000 -g 5000 monetdb
+
 # install monetdb build dependencies
 RUN yum install -y cmake3 openssl-devel wget python3  \
   	&& yum clean all \
@@ -45,5 +49,6 @@ ENV LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:/usr/local/lib"
 COPY scripts/entrypoint.sh /usr/local/bin
 
 EXPOSE 50000
+USER monetdb
 
 CMD [ "entrypoint.sh" ]
