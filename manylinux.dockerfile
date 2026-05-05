@@ -10,9 +10,6 @@ FROM quay.io/pypa/manylinux_2_28_x86_64 as build
 ARG BRANCH=default
 ARG BUILD_THREADS=4
 
-# Create users and groups
-RUN groupadd -g 5000 monetdb && \
-    useradd -u 5000 -g 5000 monetdb
 
 # install monetdb build dependencies
 RUN yum install -y cmake3 openssl-devel wget python3  \
@@ -21,7 +18,7 @@ RUN yum install -y cmake3 openssl-devel wget python3  \
 
 # download and extract monetdb
 WORKDIR /tmp 
-RUN curl -o MonetDB.tar.bz2 https://www.monetdb.org/hg/MonetDB/archive/${BRANCH}.tar.bz2
+RUN curl -Lf -o MonetDB.tar.bz2 https://www.monetdb.org/hg/MonetDB/archive/${BRANCH}.tar.bz2
 RUN tar jxf MonetDB.tar.bz2
 
 RUN mkdir /tmp/MonetDB-${BRANCH}/build
@@ -37,7 +34,6 @@ RUN cmake3 --build .  -j ${BUILD_THREADS}
 RUN cmake3 --build . --target install
 
 
-
 FROM quay.io/pypa/manylinux_2_28_x86_64 as runtime
 
 RUN rm -rf /usr/local
@@ -47,6 +43,12 @@ COPY --from=build /usr/local /usr/local
 ENV LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:/usr/local/lib"
 
 COPY scripts/entrypoint.sh /usr/local/bin
+
+# Create user AND initialize default dbfarm directory
+RUN groupadd -g 5000 monetdb && \
+    useradd -u 5000 -g 5000 -m monetdb && \
+    mkdir -p /var/monetdb5/dbfarm && \
+    chown -R monetdb:monetdb /var/monetdb5
 
 EXPOSE 50000
 USER monetdb

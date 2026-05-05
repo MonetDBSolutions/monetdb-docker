@@ -11,11 +11,8 @@ FROM ubuntu:${UBUNTU_VERSION} as build
 
 ARG BRANCH=default
 ARG BUILD_THREADS=4
-ENV DEBIAN_FRONTEND noninteractve
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Create users and groups
-RUN groupadd -g 5000 monetdb && \
-    useradd -u 5000 -g 5000 monetdb
 
 # install monetdb build dependencies
 RUN apt-get update \
@@ -26,7 +23,7 @@ RUN apt-get update \
 
 # download and extract monetdb
 WORKDIR /tmp 
-RUN curl -o MonetDB.tar.bz2 https://www.monetdb.org/hg/MonetDB/archive/${BRANCH}.tar.bz2
+RUN curl -Lf -o MonetDB.tar.bz2 https://www.monetdb.org/hg/MonetDB/archive/${BRANCH}.tar.bz2
 RUN tar jxf MonetDB.tar.bz2
 
 RUN mkdir /tmp/MonetDB-${BRANCH}/build
@@ -44,6 +41,8 @@ RUN cmake --build . --target install
 
 
 FROM ubuntu:${UBUNTU_VERSION} as runtime
+
+ENV DEBIAN_FRONTEND=noninteractive
 
 # install monetdb build dependencies
 RUN apt-get update \
@@ -67,6 +66,12 @@ COPY --from=build /usr/local /usr/local
 ENV LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:/usr/local/lib"
 
 COPY scripts/entrypoint.sh /usr/local/bin
+
+# Create user AND initialize default dbfarm directory
+RUN groupadd -g 5000 monetdb && \
+    useradd -u 5000 -g 5000 -m monetdb && \
+    mkdir -p /var/monetdb5/dbfarm && \
+    chown -R monetdb:monetdb /var/monetdb5
 
 EXPOSE 50000
 USER monetdb
