@@ -124,7 +124,10 @@ configure
 
 if [[ ! -f "$farm_dir"/.container_initialized ]]; then
 
-    create_dbfarm
+    # Check if the directory is missing OR if the config file is missing
+    if [[ ! -d "$farm_dir" ]] || [[ ! -f "$farm_dir/.merovingian_properties" ]]; then
+        create_dbfarm
+    fi
 
     set_properties
 

@@ -42,7 +42,8 @@ COPY --from=build /usr/local /usr/local
 # add shared libraries to wheels
 ENV LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:/usr/local/lib"
 
-COPY scripts/entrypoint.sh /usr/local/bin
+# Add the --chmod flag to ensure the script is executable by all users
+COPY --chmod=755 scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
 
 # Create user AND initialize default dbfarm directory
 RUN groupadd -g 5000 monetdb && \
