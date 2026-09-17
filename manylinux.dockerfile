@@ -12,7 +12,7 @@ ARG BUILD_THREADS=4
 
 
 # install monetdb build dependencies
-RUN yum install -y cmake3 openssl-devel wget python3  \
+RUN yum install -y cmake3 openssl-devel wget python3 xxhash-devel  \
   	&& yum clean all \
   	&& rm -rf /var/cache/yum
 

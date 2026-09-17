@@ -18,7 +18,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update \
     && apt-get install -y \
 		cmake bison libpcre2-dev libssl-dev curl python3 bzip2 \
-		libbz2-dev liblz4-dev liblzma-dev zlib1g-dev \
+		libbz2-dev liblz4-dev liblzma-dev zlib1g-dev libxxhash-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # download and extract monetdb
